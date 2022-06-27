@@ -18,7 +18,6 @@ class LocationScreen extends StatefulWidget {
 }
 
 class _LocationScreenState extends State<LocationScreen> {
- LoadingScreen loadingScreen=LoadingScreen();
  WeatherModel weatherModel=WeatherModel();
  dynamic weatherDecription;
  dynamic temprature;
@@ -31,22 +30,23 @@ class _LocationScreenState extends State<LocationScreen> {
   }
    updateUI(dynamic weatherData)
    {
+    // setState(() {
+    //   if(weatherData==null)
+    //   {
+    //     temprature=0;
+    //     weatherDecription="";
+    //     weatherIcon="Error";
+    //     cityName='';
+    //     return;
+    //   }
     setState(() {
-      if(weatherData==null)
-      {
-        temprature=0;
-        weatherDecription="";
-        weatherIcon="Error";
-        cityName='';
-        return;
-      }
-     double temp=weatherData()['main']['temp'];
+     double temp=weatherData['main']['temp'];
      temprature=temp.toInt();
      weatherDecription=weatherModel.getMessage(temprature);
      var condition=weatherData['weather'][0]['id'];
      weatherIcon=weatherModel.getWeatherIcon(condition);
      cityName=weatherData['name'];
-    //  print(weatherData['weather'][0]['id']);
+     print(weatherData['weather'][0]['id']);
     });
    }
   @override
@@ -71,8 +71,9 @@ class _LocationScreenState extends State<LocationScreen> {
                 mainAxisAlignment: MainAxisAlignment.spaceBetween,
                 children: <Widget>[
                   TextButton(
-                    onPressed: () {
-                        
+                    onPressed: () async{
+                        var weatherData=await weatherModel.getLocationweather();
+                        updateUI(weatherData);
                     },
                     child: Icon(
                       Icons.near_me,color: Colors.grey[300],
@@ -80,8 +81,15 @@ class _LocationScreenState extends State<LocationScreen> {
                     ),
                   ),
                   TextButton(
-                    onPressed: () {
-                  Navigator.push(context, MaterialPageRoute(builder: (context)=>CityScreen()));
+                    onPressed: () async{
+                       var typedName=await Navigator.push(context, MaterialPageRoute(builder: (context)=>CityScreen()));
+                       print(typedName);
+                       if(typedName!=null)
+                       {
+                           var getweatherName=await weatherModel.getCityWeather(typedName);
+                           updateUI(getweatherName);
+                           
+                       }
                     },
                     child: Icon(
                       Icons.location_city,color: Colors.grey[300],
@@ -93,6 +101,7 @@ class _LocationScreenState extends State<LocationScreen> {
               Padding(
                 padding: EdgeInsets.only(left: 15.0),
                 child: Row(
+                  mainAxisAlignment: MainAxisAlignment.spaceBetween,
                   children: <Widget> [
                     Text(
                       '$temprature',

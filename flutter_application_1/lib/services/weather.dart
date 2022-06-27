@@ -2,12 +2,22 @@ import 'package:geolocator/geolocator.dart';
 import 'networking.dart';
 
 
-var apiKey="e4f1471e9bba4a8b3a8f1e937fa25e8e";
+const apiKey="e4f1471e9bba4a8b3a8f1e937fa25e8e";
+const openWeatherurl="https://api.openweathermap.org/data/2.5/weather";
 
 class WeatherModel {
-  
+/*   :::::::::::::::::::::::::::: Get City Weather:::::::::::::::::::::::::::::::::::::::::::: */
+  Future<dynamic> getCityWeather(String cityName)async{
+     
+     var url="$openWeatherurl?q=$cityName&appid=$apiKey&units=metric";
+     NetworkHelper networkHelper=NetworkHelper(url);
+    var weatherData= networkHelper.getData();
+    return weatherData;
+  }
 
- Future<dynamic> getweatherData()async{
+
+/*   :::::::::::::::::::::::::::: Get Location Weather:::::::::::::::::::::::::::::::::::::::::::: */
+  Future<dynamic> getLocationweather()async{
       bool serviceEnabled;
     LocationPermission permission;
 
@@ -32,7 +42,7 @@ class WeatherModel {
      Position position = await Geolocator.getCurrentPosition(desiredAccuracy: LocationAccuracy.low);
     // latitude=position.latitude;
     // longitude=position.longitude;
-    NetworkHelper networkHelper = NetworkHelper("https://api.openweathermap.org/data/2.5/weather?lat=${position.latitude}&lon=${position.longitude}&appid=$apiKey&units=metric");
+    NetworkHelper networkHelper = NetworkHelper("$openWeatherurl?lat=${position.latitude}&lon=${position.longitude}&appid=$apiKey&units=metric");
     var weatherData=await networkHelper.getData();
     return weatherData;
 }
